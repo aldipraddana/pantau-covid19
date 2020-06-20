@@ -51,10 +51,55 @@ $(document).ready(function() {
 
 $('.searchNegara').click(()=>{
   const valOption = $('#selectNegara').val();
+  const htmlDetail_all = [];
+
+  if (valOption == 'all') {
+    $.ajax({
+        url: `https://covid19.mathdro.id/api/confirmed`,
+        type: 'GET',
+        dataType: 'JSON',
+        beforeSend: function() {
+          $('.table-area-covid').html(`<br><center>Please be patient...</center><br>`)
+        },
+        success: function(result) {
+          $('.table-area-covid').html(``)
+          for (var i = 0; i < result.length; i++) {
+            const htmlDetail = `<tr>
+                                  <td scope="row">${result[i].combinedKey}</td>
+                                  <td>${convertNumber(result[i].confirmed)}</td>
+                                  <td>${convertNumber(result[i].recovered)}</td>
+                                  <td>${convertNumber(result[i].deaths)}</td>
+                                </tr>`;
+                      htmlDetail_all.push(htmlDetail)
+          }
+          const final = htmlDetail_all.join(' ')
+          const final_html = `<table class="table">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">Lokasi</th>
+                                    <th scope="col">Dikonfirmasi</th>
+                                    <th scope="col">Sembuh</th>
+                                    <th scope="col">Meninggal Dunia</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                ${final}
+                                </tbody>
+                              </table>`
+            $('.table-area-covid').html(final_html)
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          $('.table-area-covid').html(``)
+        }
+      })
+  }else {
     $.ajax({
         url: `https://covid19.mathdro.id/api/countries/${valOption}`,
         type: 'GET',
         dataType: 'JSON',
+        beforeSend: function() {
+          $('.table-area-covid').html(`<br><center>Please be patient...</center><br>`)
+        },
         success: function(result) {
           $('.table-area-covid').html(``)
           const htmlDetail = `<table class="table">
@@ -81,6 +126,8 @@ $('.searchNegara').click(()=>{
           $('.table-area-covid').html(``)
         }
       })
+  }
+
 })
 
 class gambarKu extends HTMLElement {
